@@ -67,15 +67,16 @@ export type TypedDockerComposeResult<T> = {
 const nonEmptyString = (v: string) => v !== ''
 
 export type DockerComposePsResult = {
-  services: Array<{
+  services?: Array<{
     name: string
     command: string
-    state: string
+    status: string
     ports: Array<{
       mapped?: { address: string; port: number }
       exposed: { port: number; protocol: string }
     }>
   }>
+  json?: any
 }
 
 export const mapPsOutput = (
@@ -83,39 +84,72 @@ export const mapPsOutput = (
   options?: IDockerComposeOptions
 ): DockerComposePsResult => {
   let isQuiet = false
+  let isJson = false
   if (options?.commandOptions) {
     isQuiet =
       options.commandOptions.includes('-q') ||
       options.commandOptions.includes('--quiet') ||
       options.commandOptions.includes('--services')
+
+    isJson =
+      options.commandOptions.includes('--format') &&
+      options.commandOptions.includes('json')
   }
-  const services = output
-    .split(`\n`)
-    .filter(nonEmptyString)
-    .filter((_, index) => isQuiet || index > 0)
-    .map((line) => {
-      let nameFragment = line
-      let commandFragment = ''
-      let stateFragment = ''
-      let serviceFragment = ''
-      let untypedPortsFragment = ''
-      if (!isQuiet) {
-        ;[
-          nameFragment,
-          commandFragment,
-          serviceFragment,
-          stateFragment,
-          untypedPortsFragment
-        ] = line.split(/\s{3,}/)
+
+  const lines = output.split(`\n`).filter(nonEmptyString)
+
+  // Handle format json
+  if (isJson) {
+    // handle previous json output docker-compose less than v2.21.0
+    if (lines.length === 1) {
+      const json = JSON.parse(output)
+      if (Array.isArray(json)) {
+        return { json }
       }
-      return {
-        name: nameFragment.trim(),
-        command: commandFragment.trim(),
-        service: serviceFragment.trim(),
-        state: stateFragment.trim(),
-        ports: mapPorts(untypedPortsFragment.trim())
-      }
-    })
+    }
+
+    // handle new json format
+    const json = lines.map((line) => JSON.parse(line))
+
+    return { json }
+  }
+
+  if (!isQuiet) {
+    // remove docker output column titles
+    lines.shift()
+  }
+
+  const services = lines.map((line) => {
+    let nameFragment = line
+    let imageFragment = ''
+    let commandFragment = ''
+    let serviceFragment = ''
+    let createdAtFragment = ''
+    let statusFragment = ''
+    let untypedPortsFragment = ''
+
+    if (!isQuiet) {
+      ;[
+        nameFragment,
+        imageFragment,
+        commandFragment,
+        serviceFragment,
+        createdAtFragment,
+        statusFragment,
+        untypedPortsFragment
+      ] = line.split(/\s{3,}/)
+    }
+    return {
+      name: nameFragment.trim(),
+      image: imageFragment.trim(),
+      createdAt: createdAtFragment.trim(),
+      status: statusFragment.trim(),
+      command: JSON.parse(commandFragment.trim()),
+      service: serviceFragment.trim(),
+      ports: mapPorts(untypedPortsFragment.trim())
+    }
+  })
+
   return { services }
 }
 
