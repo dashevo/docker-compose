@@ -17,7 +17,7 @@ jobs:
     if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Check package version matches tag
         uses: geritol/match-tag-to-package-version@0.2.0
@@ -25,9 +25,9 @@ jobs:
           TAG_PREFIX: v
 
       - name: Setup Node.JS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
 
       - name: Disable NPM audit
         run: npm config set audit false

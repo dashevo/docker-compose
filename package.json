@@ -17,6 +17,7 @@
   "repository": {
     "url": "git@github.com:PDMLab/docker-compose.git"
   },
+  "packageManager": "yarn@3.6.3",
   "keywords": [
     "devops",
     "devops-tools",
