@@ -29,6 +29,8 @@ jobs:
         with:
           node-version: '18'
 
+      - run: corepack enable
+
       - name: Disable NPM audit
         run: npm config set audit false
 
