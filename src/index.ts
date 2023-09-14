@@ -237,19 +237,16 @@ export const execCompose = (
     }
 
     childProc.stdout.on('data', (chunk): void => {
-      console.log('data stdout', chunk.toString())
       result.out += chunk.toString()
       options.callback?.(chunk, 'stdout')
     })
 
     childProc.stderr.on('data', (chunk): void => {
-      console.log('data stderr', chunk.toString())
       result.err += chunk.toString()
       options.callback?.(chunk, 'stderr')
     })
 
     childProc.on('exit', (exitCode): void => {
-      console.log('data exit' + exitCode)
       result.exitCode = exitCode
       if (exitCode === 0) {
         resolve(result)
@@ -482,7 +479,6 @@ export const ps = async function (
   options?: IDockerComposeOptions
 ): Promise<TypedDockerComposeResult<DockerComposePsResult>> {
   try {
-    console.log('')
     const result = await execCompose('ps', [], options)
     const data = mapPsOutput(result.out, options)
     return {
