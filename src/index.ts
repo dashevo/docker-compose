@@ -490,36 +490,6 @@ export const ps = async function (
   }
 }
 
-export const images = async function (
-  options?: IDockerComposeOptions
-): Promise<TypedDockerComposeResult<DockerComposePsResult>> {
-  try {
-    const result = await execCompose('images', [], options)
-    const data = mapPsOutput(result.out, options)
-    return {
-      ...result,
-      data
-    }
-  } catch (error) {
-    return Promise.reject(error)
-  }
-}
-
-export const ls = async function (
-  options?: IDockerComposeOptions
-): Promise<TypedDockerComposeResult<DockerComposePsResult>> {
-  try {
-    const result = await execCompose('ls', [], options)
-    const data = mapPsOutput(result.out, options)
-    return {
-      ...result,
-      data
-    }
-  } catch (error) {
-    return Promise.reject(error)
-  }
-}
-
 export const push = function (
   options: IDockerComposePushOptions = {}
 ): Promise<IDockerComposeResult> {
