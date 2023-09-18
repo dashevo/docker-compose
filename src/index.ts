@@ -139,15 +139,16 @@ export const mapPsOutput = (
         untypedPortsFragment
       ] = line.split(/\s{3,}/)
     }
+
     return {
       name: nameFragment.trim(),
       image: imageFragment.trim(),
       createdAt: createdAtFragment.trim(),
       status: statusFragment.trim(),
-      command: JSON.parse(commandFragment.trim()),
+      command: commandFragment.trim(),
       service: serviceFragment.trim(),
       ports: mapPorts(untypedPortsFragment.trim())
-    }
+    }π
   })
 
   return { services }
