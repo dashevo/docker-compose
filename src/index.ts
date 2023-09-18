@@ -148,7 +148,7 @@ export const mapPsOutput = (
       command: commandFragment.trim(),
       service: serviceFragment.trim(),
       ports: mapPorts(untypedPortsFragment.trim())
-    }π
+    }
   })
 
   return { services }
